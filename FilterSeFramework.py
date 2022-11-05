@@ -6,7 +6,7 @@ path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\sa
 #df = pd.read_csv(path + r'\Stack-testData_2022_ytd.csv')
 df = pd.read_csv(path + r'\df_out.csv')
 
-#convert _Time (object) to Datetime(datetime64[ns...]
+#conve rt _Time (object) to Datetime(datetime64[ns...]
 df['Datetime']=pd.to_datetime(df['Datetime'])
 
 calculated_data = {}
