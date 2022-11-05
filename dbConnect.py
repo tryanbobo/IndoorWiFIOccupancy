@@ -1,6 +1,7 @@
 from config import config
 import psycopg2
 
+
 def connect():
     """ Connect to the PostgreSQL database server """
     conn = None
@@ -14,6 +15,14 @@ def connect():
 
         # create a cursor
         cur = conn.cursor()
+
+        # test statement ###############################################
+        cur.execute("SELECT _time, _user, vlan_role, ap_name from testwifilogs")
+        rows = cur.fetchall()
+        for row in rows:
+            print ("_time = ", row[0])
+
+        #################################################################
 
         # execute a statement
         print('PostgreSQL database version:')
