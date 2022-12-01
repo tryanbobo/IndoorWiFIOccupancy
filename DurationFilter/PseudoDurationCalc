@@ -1,0 +1,13 @@
+data_container = {}
+
+final_data = Dateframe(user, role, floor, datetime, duration)
+
+for row in Table3:
+	if user not in data_container:
+	    add user with floor and datetime
+
+	elseif floor does not equal data_container user floor designation:
+	    duration = current datetime - previously stored datetime
+	    add record to final_date with previous record and newly calculated duration
+	    update data_container with latest row information
+

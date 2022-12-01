@@ -1,22 +1,37 @@
 import pandas as pd
-import datetime
+from scipy.stats import zscore
+import matplotlib.pyplot as plt
+from pprint import pprint
 import numpy as np
-from sklearn.datasets import load_iris
+import seaborn as sns
 
 path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\sampleData'
 df = pd.read_csv(path + r'\Stack-testData_2022_ytd.csv')
 
 #selects the digit that indicates floor from AP_Name and adds it to a new column "Floor"
-#df['Floor'] = df['AP_Name'].str.extract('^[^\.]*\.[^\.]*\.[^\.]*?([0-9])', expand=True)
+df['Floor'] = df['AP_Name'].str.extract('^[^\.]*\.[^\.]*\.[^\.]*?([0-9])', expand=True)
 
 #convert _Time (object) to Datetime(datetime64[ns...]
 df['DateTime']=pd.to_datetime(df['Datetime'])
 print(df.dtypes)
 
 
+####################################################################################
+#calc duration each user spend on each floor TOTAL
+#df["duration"] = df.groupby(["_user","Floor"])["DateTime"].transform(lambda x: np.ptp(x.to_numpy()))
+#print(df)
 
-df["duration"] = df.groupby(["_user","Floor"])["DateTime"].transform(lambda x: np.ptp(x.to_numpy()))
-print(df)
+####################################################################################
+
+#calc time between connections per user
+df["connectDiff"] = df.groupby(["_user"])["DateTime"].diff()
+#show statics about connection times
+print(df.groupby(["_user"])["connectDiff"].describe())
+
+####################################################################################
+
+#calc z score of ind user connection times
+df["zscore"] = df["connectDiff"].pipe(lambda x: (x-x.mean()) / x.std())
 
 ####################################################################################
 
