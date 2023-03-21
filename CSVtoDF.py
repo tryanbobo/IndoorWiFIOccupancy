@@ -7,7 +7,13 @@ from sklearn.datasets import load_iris
 path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\sampleData'
 df = pd.read_csv(path + r'\testData_2022_ytd.csv')
 
+
+#removes dublitate records
+df.drop_duplicates()
+
+print(df)
 #selects the digit that indicates floor from AP_Name and adds it to a new column "Floor"
+# AI generated re "\.(\d)(?=\d{2}$)", maybe try this?
 df['Floor'] = df['AP_Name'].str.extract('^[^\.]*\.[^\.]*\.[^\.]*?([0-9])', expand=True)
 
 #convert _Time (object) to Datetime(datetime64[ns...]
