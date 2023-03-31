@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\WifiData'
-df = pd.read_csv(path + r'\bobo_23_02_19_to_23_03_04.anon.csv')
+path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\spring2023\NeuroNet'
+df = pd.read_csv(path + r'\bobo_23_03_11_to_23_03_22.csv')
 pd.set_option('display.max_columns', None)
 
 ########################################################################
@@ -14,7 +14,7 @@ Preprocessing
 print('Raw record count: ', len(df.index), ':0')
 
 #dropping unnecessary columns
-df = df.drop(['vlan', 'action', 'hostname', 'rssi', 'receivedSignalStrength', 'instantaneous_rssi', 'client_ip', 'apMac'], axis=1)
+df = df.drop(['vlan', 'hostname', 'rssi', 'receivedSignalStrength', 'instantaneous_rssi', 'client_ip', 'apMac'], axis=1)
 
 #remove duplicates
 df = df.drop_duplicates()
@@ -37,6 +37,10 @@ df['AP_Name'] = df['AP_Name'].replace({
 #capitalize all records in the 'AP_Name' column
 df['AP_Name'] = df['AP_Name'].str.upper()
 
+# removes all records where AP_Name does not contain 'ALK' or 'alkek'
+    # ues this for data of entire campus (if needed)
+df = df[df['AP_Name'].str.contains('ALK|alkek', case=False)]
+print('Record count with only Alkek APs: ', len(df.index), ':O')
 #select the digit that indicates floor from AP_Name and add it to a new column "Floor"
 # AI generated re "\.(\d)(?=\d{2}$)", maybe try this?
 df['Floor'] = df['AP_Name'].str.extract('^[^\.]*\.[^\.]*\.[^\.]*?([0-9])', expand=True)
@@ -45,9 +49,10 @@ df['Floor'] = df['AP_Name'].str.extract('^[^\.]*\.[^\.]*\.[^\.]*?([0-9])', expan
 df['Datetime'] = pd.to_datetime(df['_time'])
 print(df.dtypes)
 
+
 print("Record count at end of preprocessing: ", len(df.index))
 #print(df)
 
 
 
-df.to_csv(path + r'\output\Preprocessed.alk_data_23_02_19_to_23_04_03.csv')
+df.to_csv(path + r'\output\Preprocessed_GT.bobo_23_03_11_to_23_03_22.csv')
