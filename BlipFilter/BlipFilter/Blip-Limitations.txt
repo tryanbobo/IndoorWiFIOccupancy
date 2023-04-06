@@ -1,0 +1,19 @@
+Limitations of "BlipFilter8" according to ChatGPT (find supportive literature):
+
+The method you're using to correct for Wi-Fi connection blips has some potential limitations and disadvantages:
+
+Assumptions about time thresholds: This method assumes that a valid floor change should last at least 3 minutes and a blip should last less than 2 minutes. These thresholds might not accurately represent the real-world scenarios, and could lead to misclassification of valid floor changes or blips.
+
+Isolated changes: The method might not be as effective in handling isolated blips that occur at the beginning or end of the dataset since the code checks for consecutive floor changes. This could potentially lead to some blips remaining uncorrected.
+
+Inability to handle rapid floor changes: In cases where a user moves between floors quickly (e.g., taking stairs or elevators), the method might not effectively identify the floor changes, leading to misclassification of valid floor changes as blips.
+
+Limited applicability: The current approach is specifically designed for correcting floor changes due to Wi-Fi connection blips. It may not be as effective for other types of data or for more complex patterns of blips.
+
+Sensitivity to data quality: This method relies on the quality and consistency of the input data. Inaccurate timestamps, missing data, or other data quality issues may affect the performance of the method.
+
+Lack of robustness: The method might not perform well if there are continuous short-duration blips or if there are blips with longer durations than the predefined thresholds. This could lead to over- or under-correction of the data.
+
+Inefficiency for large datasets: The method is not optimized for large datasets, and its performance may degrade as the dataset size increases. For very large datasets, more efficient algorithms might be required.
+
+Despite these limitations, the method could provide a reasonable approximation for correcting Wi-Fi connection blips in the specific context of your dataset. However, it's essential to validate the results and test the method against other approaches to ensure that it meets your requirements.

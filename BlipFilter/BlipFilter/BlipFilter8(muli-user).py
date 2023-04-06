@@ -45,12 +45,14 @@ def correct_floor(df):
             time_on_current_floor += (row['Datetime'] - last_floor_time).seconds / 60
             last_floor_time = row['Datetime']
 
-    return pd.Series(corrected_floor)
+    # Create a new DataFrame with the same index as the input DataFrame and the corrected_floor as a column
+    corrected_floor_df = df.copy()
+    corrected_floor_df['Corrected_Floor'] = corrected_floor
+    return corrected_floor_df
 
-# Create Corrected_Floor column
-corrected_floors = grouped.apply(correct_floor).explode().reset_index(level=0, drop=True)
-
-df['Corrected_Floor'] = corrected_floors
+# Apply the correct_floor function to each group and concatenate the resulting DataFrames
+corrected_floor_dfs = [correct_floor(group) for _, group in grouped]
+df = pd.concat(corrected_floor_dfs)
 
 # Define function to correct isolated floor changes (Condition 2)
 def correct_isolated_floor_changes(df):
