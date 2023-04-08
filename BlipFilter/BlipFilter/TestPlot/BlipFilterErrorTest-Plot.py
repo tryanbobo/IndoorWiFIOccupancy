@@ -1,3 +1,4 @@
+import os
 import math
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -39,9 +40,16 @@ def plot_time_series(df, title):
     fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5), sharey=True)
     axs = axs.flatten()
 
+    # set the main title for the entire plot
+    fig.suptitle(title, fontsize=16, y=1.02)
+
     for i, date in enumerate(unique_dates):
         # Select data for the specific date
         daily_df = df.loc[date.strftime('%Y-%m-%d')]
+
+        #calculate RMSE for the specific date
+        cleanDaily_df = df_combined.dropna(subset=['GroundTruthFloor'])
+        rmse = math.sqrt(mean_squared_error(cleanDaily_df['GroundTruthFloor'], cleanDaily_df['Corrected_Floor']))
 
         # Plot the time series for the specific date
         axs[i].plot(daily_df.index, daily_df['Floor'], '--', label='Floor')
@@ -50,7 +58,7 @@ def plot_time_series(df, title):
 
         axs[i].set_xlabel('Datetime')
         axs[i].set_ylabel('Floor')
-        axs[i].set_title(f'{title} - {date.strftime("%Y-%m-%d")}')
+        axs[i].set_title(f'{title} - {date.strftime("%Y-%m-%d")}', fontsize=10)
 
         # Format x-axis ticks to display hour and minute
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
@@ -58,7 +66,7 @@ def plot_time_series(df, title):
         # Set y-axis ticks to integers from 1 to 7
         axs[i].set_yticks(range(1, 8))
 
-        axs[i].legend(loc='best')
+        axs[i].legend(title=f'RMSE ({daily_df["GroundTruthFloor"].name} vs {daily_df["Corrected_Floor"].name}): {rmse:.2f}', loc='best')
 
     # Remove extra subplots if any
     for i in range(num_dates, num_rows * num_cols):
@@ -66,7 +74,17 @@ def plot_time_series(df, title):
 
     # Adjust the layout and display the plot
     plt.tight_layout()
-    plt.show()
+    fig.subplots_adjust(hspace=0.326, bottom=0.067, top=0.905)
+
+    #set main title for entire plot
+    #fig.suptitle(title, fontsize=16, y=1.02)
+    # save plot as png
+    outputFile = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\spring2023\BlipFilter\output\figures'
+
+    outputFile = os.path.join(outputFile, f'{title}.png')
+    plt.savefig(outputFile, bbox_inches='tight')
+
+    #plt.show()
 
 # Define function to correct Floor column with variable thresholds
 def correct_floor_v2(df, threshold_time_on_current_floor, threshold_last_floor_time):
@@ -120,8 +138,8 @@ def correct_isolated_floor_changes(df):
 # Main loop iterating through threshold combinations
 results = []
 
-for threshold_time_on_current_floor in range(1, 6):
-    for threshold_last_floor_time in range(1, 6):
+for threshold_time_on_current_floor in range(0, 6):
+    for threshold_last_floor_time in range(0, 6):
         corrected_floor_dfs = [correct_floor_v2(group, threshold_time_on_current_floor, threshold_last_floor_time) for _, group in grouped]
         df_combined = pd.concat(corrected_floor_dfs)
         df_combined = correct_isolated_floor_changes(df_combined)
@@ -139,8 +157,8 @@ for threshold_time_on_current_floor in range(1, 6):
             'mae': mae
         })
         # Plot the time series for the current combination (only for the first user for demonstration purposes)
-        if threshold_time_on_current_floor < 3 and threshold_last_floor_time < 3:
-            plot_title = f'Time Series for threshold_time_on_current_floor={threshold_time_on_current_floor} and threshold_last_floor_time={threshold_last_floor_time}'
+        if threshold_time_on_current_floor < 6 and threshold_last_floor_time < 6:
+            plot_title = f'Threshold for current floor={threshold_time_on_current_floor} and threshold last floor={threshold_last_floor_time}'
             plot_time_series(df_combined[df_combined['user'] == df_combined['user'].unique()[0]], plot_title)
     # Convert results to a DataFrame
     results_df = pd.DataFrame(results)
