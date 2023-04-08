@@ -18,7 +18,7 @@ df['time_diff'] = df.groupby(['user', 'Floor'])['Datetime'].diff()
 print(df)
 
 # filter out records where time difference is greater than 1 hour
-#df = df[df['time_diff'] < pd.Timedelta(hours=1)]
+df = df[df['time_diff'] < pd.Timedelta(hours=1)]
 
 # calculate the stay time for each user on each floor per visit
 df['stay_time'] = df.groupby(['user', 'Floor'])['time_diff'].cumsum()
