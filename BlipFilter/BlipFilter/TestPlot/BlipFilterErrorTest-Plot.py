@@ -24,6 +24,7 @@ df= df.drop_duplicates()
 grouped = df.groupby(['user'])
 
 # Function to plot out the various floor columns
+# Function to plot out the various floor columns
 def plot_time_series(df, title):
     # Set 'Datetime' as index
     df = df.set_index('Datetime')
@@ -40,25 +41,28 @@ def plot_time_series(df, title):
     fig, axs = plt.subplots(num_rows, num_cols, figsize=(15, num_rows * 5), sharey=True)
     axs = axs.flatten()
 
-    # set the main title for the entire plot
-    fig.suptitle(title, fontsize=16, y=1.02)
+    # Calculate overall RMSE for the entire DataFrame
+    clean_df = df.dropna(subset=['GroundTruthFloor'])
+    overall_rmse = math.sqrt(mean_squared_error(clean_df['GroundTruthFloor'], clean_df['Corrected_Floor']))
+
+
 
     for i, date in enumerate(unique_dates):
         # Select data for the specific date
         daily_df = df.loc[date.strftime('%Y-%m-%d')]
 
-        #calculate RMSE for the specific date
-        cleanDaily_df = df_combined.dropna(subset=['GroundTruthFloor'])
+        # Calculate RMSE for the specific date
+        cleanDaily_df = daily_df.dropna(subset=['GroundTruthFloor'])
         rmse = math.sqrt(mean_squared_error(cleanDaily_df['GroundTruthFloor'], cleanDaily_df['Corrected_Floor']))
 
         # Plot the time series for the specific date
-        axs[i].plot(daily_df.index, daily_df['Floor'], '--', label='Floor')
         axs[i].plot(daily_df.index, daily_df['GroundTruthFloor'], '-', label='GroundTruthFloor')
-        axs[i].plot(daily_df.index, daily_df['Corrected_Floor'], '--', label='Corrected_Floor')
+        axs[i].plot(daily_df.index, daily_df['Floor'], '--', label='Floor')
+        axs[i].plot(daily_df.index, daily_df['Corrected_Floor'], ':', label='Corrected_Floor')
 
         axs[i].set_xlabel('Datetime')
         axs[i].set_ylabel('Floor')
-        axs[i].set_title(f'{title} - {date.strftime("%Y-%m-%d")}', fontsize=10)
+        axs[i].set_title(f'{date.strftime("%Y-%m-%d")} (RMSE: {rmse:.2f})', fontsize=10)
 
         # Format x-axis ticks to display hour and minute
         axs[i].xaxis.set_major_formatter(mdates.DateFormatter('%H:%M'))
@@ -66,7 +70,7 @@ def plot_time_series(df, title):
         # Set y-axis ticks to integers from 1 to 7
         axs[i].set_yticks(range(1, 8))
 
-        axs[i].legend(title=f'RMSE ({daily_df["GroundTruthFloor"].name} vs {daily_df["Corrected_Floor"].name}): {rmse:.2f}', loc='best')
+        axs[i].legend(loc='best')
 
     # Remove extra subplots if any
     for i in range(num_dates, num_rows * num_cols):
@@ -74,17 +78,22 @@ def plot_time_series(df, title):
 
     # Adjust the layout and display the plot
     plt.tight_layout()
+
     fig.subplots_adjust(hspace=0.326, bottom=0.067, top=0.905)
 
-    #set main title for entire plot
-    #fig.suptitle(title, fontsize=16, y=1.02)
-    # save plot as png
+    # Set main title for entire plot with overall RMSE using plt.annotate
+    plt.annotate(f'{title} (Overall RMSE: {overall_rmse:.2f})', xy=(0.5, 0.98), xycoords='figure fraction', ha='center',
+                 va='top', fontsize=16)
+
+    # Save plot as png
     outputFile = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\spring2023\BlipFilter\output\figures'
 
-    outputFile = os.path.join(outputFile, f'{title}.png')
+    outputFile = os.path.join(outputFile,f'{title}.png')
     plt.savefig(outputFile, bbox_inches='tight')
-
+    print(f"Figure {title} saved at {outputFile}")
+    plt.close(fig)
     #plt.show()
+
 
 # Define function to correct Floor column with variable thresholds
 def correct_floor_v2(df, threshold_time_on_current_floor, threshold_last_floor_time):
@@ -149,29 +158,39 @@ for threshold_time_on_current_floor in range(0, 6):
         mse = mean_squared_error(df_clean['GroundTruthFloor'], df_clean['Corrected_Floor'])
         mae = mean_absolute_error(df_clean['GroundTruthFloor'], df_clean['Corrected_Floor'])
 
+        #calc RMSE
+        rmse = math.sqrt(mse)
+
         # Store results
         results.append({
-            'threshold_time_on_current_floor': threshold_time_on_current_floor,
-            'threshold_last_floor_time': threshold_last_floor_time,
+            'Initial floor threshold': threshold_last_floor_time,
+            'Succeeding floor threshold ': threshold_time_on_current_floor,
             'mse': mse,
-            'mae': mae
+            'mae': mae,
+            'rmse': rmse
         })
         # Plot the time series for the current combination (only for the first user for demonstration purposes)
         if threshold_time_on_current_floor < 6 and threshold_last_floor_time < 6:
-            plot_title = f'Threshold for current floor={threshold_time_on_current_floor} and threshold last floor={threshold_last_floor_time}'
+            plot_title = f' Blip Filter; Initial floor threshold = {threshold_last_floor_time}-minutes and Succeeding floor threshold = {threshold_time_on_current_floor}-minutes'
             plot_time_series(df_combined[df_combined['user'] == df_combined['user'].unique()[0]], plot_title)
-    # Convert results to a DataFrame
-    results_df = pd.DataFrame(results)
 
-    # Find the combination of thresholds with the lowest MSE and MAE
-    best_mse_row = results_df.loc[results_df['mse'].idxmin()]
-    best_mae_row = results_df.loc[results_df['mae'].idxmin()]
+# Convert results to a DataFrame
+results_df = pd.DataFrame(results)
 
-    print("Best MSE combination:")
-    print(best_mse_row)
+# Sort results_df by RMSE and print the top 5 rows
+results_df = results_df.sort_values(by='rmse')
 
-    print("\nBest MAE combination:")
-    print(best_mae_row)
+print("Top 5 best RMSE combinations:")
+print(results_df.head(5))
+
+# Find the combination of thresholds with the lowest MSE and MAE
+best_mse_row = results_df.loc[results_df['mse'].idxmin()]
+best_mae_row = results_df.loc[results_df['mae'].idxmin()]
+
+print("Best MSE combination:")
+print(best_mse_row)
+print("\nBest MAE combination:")
+print(best_mae_row)
 
 # Find post filter MAE and MSE results (ground truth and raw wifi reading)
 df_clean = df.dropna(subset=['GroundTruthFloor'])
@@ -180,3 +199,4 @@ mae = mean_absolute_error(df_clean['GroundTruthFloor'], df_clean['Floor'])
 
 print('MSE of raw Wi-Fi and Ground Truth = {}'.format(mse))
 print('MAE of raw Wi-Fi and Ground Truth = {}'.format(mae))
+
