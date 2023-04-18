@@ -1,0 +1,5 @@
+The current mobility filter removes records where the stay time is less than 5 minutes, which can help filter out noise and transient movements in the building. However, it is essential to consider the specific characteristics of your data and the building when deciding if the mobility filter is adequate.
+
+In a public building with users coming in and out and changing floors, you might want to adjust the mobility filter threshold based on the nature of the activities taking place in the building. For example, if most activities require a longer duration, you can increase the threshold; conversely, if there are many short-duration activities, you might want to decrease the threshold or remove the filter altogether.
+
+Ultimately, you should carefully examine your data and consider the nature of the activities in the building when determining the most appropriate mobility filter. If you have any doubts, you could try different thresholds and compare the results to see which one better aligns with your objectives and the behavior of users in the building.
