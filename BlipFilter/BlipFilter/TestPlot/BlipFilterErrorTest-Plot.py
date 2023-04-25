@@ -7,7 +7,7 @@ from sklearn.metrics import mean_squared_error, mean_absolute_error
 
 # Load data
 path = r"C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\spring2023\NeuroNet\output"
-file = path + '\GtMerged.csv'
+file = path + '\GtMergedEdited.csv'
 df = pd.read_csv(file, parse_dates=['Datetime'])
 
 # Convert Datetime column to datetime object
@@ -57,7 +57,7 @@ def plot_time_series(df, title):
 
         # Plot the time series for the specific date
         axs[i].plot(daily_df.index, daily_df['GroundTruthFloor'], '-', label='Floor: Ground Truth')
-        axs[i].plot(daily_df.index, daily_df['Floor'], '--', label='Floor: Wi-Fi')
+        axs[i].plot(daily_df.index, daily_df['Floor'], '--', label='Floor: Wi-Fi Raw')
         axs[i].plot(daily_df.index, daily_df['Corrected_Floor'], ':', label='Floor: Wi-Fi Corrected')
 
         axs[i].set_xlabel('Datetime')
@@ -174,7 +174,7 @@ for threshold_time_on_initial_floor in range(0, 4):
             'rmse': rmse
         })
         # Plot the time series for the current combination (only for the first user for demonstration purposes)
-        if threshold_time_on_initial_floor < 6 and threshold_time_on_succeeding_floor < 6:
+        if threshold_time_on_initial_floor < 4 and threshold_time_on_succeeding_floor < 4:
             plot_title = f' Blip Filter: Initial floor threshold = {threshold_time_on_succeeding_floor}-minutes and Succeeding floor threshold = {threshold_time_on_initial_floor}-minutes'
             plot_time_series(df_combined[df_combined['user'] == df_combined['user'].unique()[0]], plot_title)
 
