@@ -22,10 +22,8 @@ df['visit_id'] = (df['time_diff'] > pd.Timedelta(hours=1)).cumsum()
 # Calculate the stay time for each user on each floor per visit
 df['stay_time'] = df.groupby(['user', 'Floor', 'visit_id'])['time_diff'].cumsum()
 
-# Non-Human Filter: filter out records where total stay time is greater than 12 hours
-filtered_data = df.groupby(['user', pd.Grouper(key='Datetime', freq='24H')])['stay_time'].sum().reset_index()
-filtered_data = filtered_data[filtered_data['stay_time'] < pd.Timedelta(hours=12)]
-filtered_data = df[df['user'].isin(filtered_data['user'])]
+# Non-Human Filter: filter out records with stay times over 12 hours
+filtered_data = df[df['stay_time'] <= pd.Timedelta(hours=12)]
 
 # mobility lookup table as nested dictionary
 mobility_lookup = {

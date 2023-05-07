@@ -1,5 +1,5 @@
 import win32com.client as win32
-
+path = r"C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\AlkekSensourceData"
 outlook = win32.Dispatch("Outlook.Application").GetNamespace("MAPI")
 inbox = outlook.GetDefaultFolder(6)
 #get all messages in this folder
@@ -28,6 +28,6 @@ for email in emails:
     #unpack the tuple to get at info
     subject, from_address, attachments = email
     for attachment in attachments:
-        attachment.SaveAsFile(r"C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\AlkekSensourceData" + subject + ".csv")
+        attachment.SaveAsFile(path + "/" + subject + ".csv")
 print("Saved {0} attachments".format(len(emails)))
 #print(emails)

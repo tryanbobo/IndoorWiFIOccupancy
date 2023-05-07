@@ -27,6 +27,22 @@ filtered_data = df.groupby(['user', pd.Grouper(key='Datetime', freq='24H')])['st
 filtered_data = filtered_data[filtered_data['stay_time'] < pd.Timedelta(hours=12)]
 filtered_data = df[df['user'].isin(filtered_data['user'])]
 
+# Remove stay times over 12 hours in a single record
+filtered_data = filtered_data[filtered_data['stay_time'] <= pd.Timedelta(hours=12)]
+
+# Calculate cumulative stay time for each user and day
+filtered_data['day'] = filtered_data['Datetime'].dt.floor('D')
+user_day_stay_time = filtered_data.groupby(['user', 'day']).agg({'stay_time': 'sum'}).reset_index()
+
+# Filter out user-days with a cumulative stay time of more than 12 hours
+user_day_stay_time = user_day_stay_time[user_day_stay_time['stay_time'] <= pd.Timedelta(hours=12)]
+
+# Merge the filtered user_day_stay_time DataFrame back with the original filtered_data DataFrame
+filtered_data = filtered_data.merge(user_day_stay_time[['user', 'day']], on=['user', 'day'])
+
+# Drop the 'day' column
+filtered_data.drop(columns=['day'], inplace=True)
+
 # Mobility Filter: filter out records where stay time is less than 5 minutes
 filtered_data = filtered_data[filtered_data['stay_time'] >= pd.Timedelta(minutes=5)]
 
@@ -41,7 +57,7 @@ filtered_data = filtered_data.groupby(['user', 'Floor', 'visit_id'], as_index=Fa
 filtered_data = filtered_data.sort_values(['user', 'Datetime'])
 
 # Export to csv
-filtered_data.to_csv(path + r'\Mobility_Non-humanFilter.csv')
+filtered_data.to_csv(path + r'\Mobility(Static)_Non-humanFilter.csv')
 
 ################################Plotting##############################################
 

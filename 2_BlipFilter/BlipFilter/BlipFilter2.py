@@ -40,4 +40,4 @@ df['changed'] = False
 df.at[changed_records, 'changed'] = True
 
 # Save the corrected data to a new file
-df.to_csv(path + r'\output\BlipFilter\alk_data_23_02_21-BlipFilter.csv', index=False)
+df.to_csv(path + r'\output\2_BlipFilter\alk_data_23_02_21-2_BlipFilter.csv', index=False)
