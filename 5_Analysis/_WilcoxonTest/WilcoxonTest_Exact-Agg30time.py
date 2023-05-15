@@ -10,7 +10,7 @@ occupancy_df['Datetime'] = pd.to_datetime(occupancy_df['Datetime'])
 ground_truth_df['Median_Time'] = pd.to_datetime(ground_truth_df['Median_Time'])
 
 # Convert to timezone-naive datetime objects
-occupancy_df['Datetime'] = occupancy_df['Datetime'].dt.tz_convert(None)
+occupancy_df['Datetime'] = occupancy_df['Datetime'].dt.tz_convert('US/Central').dt.tz_localize(None)
 
 # Convert stay_time column to timedelta objects
 occupancy_df['stay_time'] = pd.to_timedelta(occupancy_df['stay_time'])
