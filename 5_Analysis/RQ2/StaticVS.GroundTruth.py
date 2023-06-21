@@ -27,7 +27,7 @@ for idx, row in GroundTruth.iterrows():
                                 (WifiStatic['Corrected_Floor'] == row['Floor'])]['user'].nunique()
 
 # Save GroundTruth to a new CSV file
-GroundTruth.to_csv(r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\WifiData\output\RQ2\GT-StaticWifi.csv', index=False)
+GroundTruth.to_csv(r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\Analysis\RQ2_\GT-StaticWifi.csv', index=False)
 
-print(filtered)
+#print(filtered)
 print(WifiStatic)

@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
 
-path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\spring2023\NeuroNet'
-df = pd.read_csv(path + r'\bobo_23_03_11_to_23_03_22.csv')
+path = r'C:\Users\tb1302\OneDrive - Texas State University\IndStudy_Bobo\Data\WifiData'
+df = pd.read_csv(path + r'\bobo_23_02_19_to_23_03_04.anon.csv')
 pd.set_option('display.max_columns', None)
 
 ########################################################################
